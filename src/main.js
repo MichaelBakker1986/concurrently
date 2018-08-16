@@ -1,19 +1,19 @@
 #!/usr/bin/env node
-'use strict';
+'use strict'
 
-const Rx = require('rx');
-const path = require('path');
-const formatDate = require('date-fns/format');
-const program = require('commander');
-const _ = require('lodash');
-const treeKill = require('tree-kill');
-const chalk = require('chalk');
-const spawn = require('spawn-command');
-const supportsColor = require('supports-color');
-const IS_WINDOWS = /^win/.test(process.platform);
+const Rx = require('rx')
+const path = require('path')
+const formatDate = require('date-fns/format')
+const program = require('commander')
+const _ = require('lodash')
+const treeKill = require('tree-kill')
+const chalk = require('chalk')
+const spawn = require('spawn-command')
+const supportsColor = require('supports-color')
+const IS_WINDOWS = /^win/.test(process.platform)
 
-const findChild = require('./findChild.js');
-const parseCmds = require('./parseCmds');
+const findChild = require('./findChild.js')
+const parseCmds = require('./parseCmds')
 
 let config = {
     // Kill other processes if one dies
@@ -63,111 +63,110 @@ let config = {
 
     // Default identifier for child to which input on stdin should be sent.
     defaultInputTarget: '0'
-};
+}
 
 function main() {
-    const firstBase = path.basename(process.argv[0]);
-    const secondBase = path.basename(process.argv[1]);
+    const firstBase = path.basename(process.argv[0])
+    const secondBase = path.basename(process.argv[1])
     if (firstBase === 'concurrent' || secondBase === 'concurrent') {
-        console.error('Warning: "concurrent" command is deprecated, use "concurrently" instead.\n');
+        console.error('Warning: "concurrent" command is deprecated, use "concurrently" instead.\n')
     }
 
-    parseArgs();
-    config = mergeDefaultsWithArgs(config);
+    parseArgs()
+    config = mergeDefaultsWithArgs(config)
 
-    const cmds = parseCmds(program.args, config);
-    run(cmds);
+    const cmds = parseCmds(program.args, config)
+    run(cmds)
 }
 
 function parseArgs() {
     program
-        .version(require('../package.json').version)
-        .usage('[options] <command ...>')
-        .option(
-            '-k, --kill-others',
-            'kill other processes if one exits or dies'
-        )
-        .option(
-            '--kill-others-on-fail',
-            'kill other processes if one exits with non zero status code'
-        )
-        .option(
-            '--no-color',
-            'disable colors from logging'
-        )
-        .option(
-            '-p, --prefix <prefix>',
-            'prefix used in logging for each process.\n' +
-            'Possible values: index, pid, time, command, name, none, or a template. Default: ' +
-            'index or name (when --names is set). Example template: "{time}-{pid}"\n'
-        )
-        .option(
-            '-n, --names <names>',
-            'List of custom names to be used in prefix template.\n' +
-            'Example names: "main,browser,server"\n'
-        )
-        .option(
-            '--name-separator <char>',
-            'The character to split <names> on.\n' +
-            'Default: "' + config.nameSeparator + '". Example usage: ' +
-            'concurrently -n "styles,scripts|server" --name-separator "|" <command ...>\n'
-        )
-        .option(
-            '-c, --prefix-colors <colors>',
-            'Comma-separated list of chalk colors to use on prefixes. If there are more commands than colors, the last color will be repeated.\n' +
-            'Available modifiers: reset, bold, dim, italic, underline, inverse, hidden, strikethrough\n' +
-            'Available colors: black, red, green, yellow, blue, magenta, cyan, white, gray\n' +
-            'Available background colors: bgBlack, bgRed, bgGreen, bgYellow, bgBlue, bgMagenta, bgCyan, bgWhite\n' +
-            'See https://www.npmjs.com/package/chalk for more information.\n' +
-            'Default: "' + config.prefixColors + '". Example: "black.bgWhite,cyan,gray.dim"\n'
-        )
-        .option(
-            '-t, --timestamp-format <format>',
-            'specify the timestamp in moment/date-fns format. Default: ' +
-            config.timestampFormat + '\n'
-        )
-        .option(
-            '-r, --raw',
-            'output only raw output of processes,' +
-            ' disables prettifying and concurrently coloring'
-        )
-        .option(
-            '-s, --success <first|last|all>',
-            'Return exit code of zero or one based on the success or failure ' +
-            'of the "first" child to terminate, the "last" child, or succeed ' +
-            ' only if "all" child processes succeed. Default: ' +
-            config.success + '\n'
-        )
-        .option(
-            '-l, --prefix-length <length>',
-            'limit how many characters of the command is displayed in prefix.\n' +
-            'The option can be used to shorten long commands.\n' +
-            'Works only if prefix is set to "command". Default: ' +
-            config.prefixLength + '\n'
-        )
-        .option(
-            '--allow-restart',
-            'Restart a process which died. Default: ' +
-            config.allowRestart + '\n'
-        )
-        .option(
-            '--restart-after <miliseconds>',
-            'delay time to respawn the process. Default: ' +
-            config.restartAfter + '\n'
-        )
-        .option(
-            '--restart-tries <times>',
-            'limit the number of respawn tries. Default: ' +
-            config.restartTries + '\n'
-
-        )
-        .option(
-            '--default-input-target <identifier>',
-            'identifier for child process to which input on ' +
-            'stdin should be sent if not specified at start ' +
-            'of input. Can be either the index or the name ' +
-            'of the process. Default: ' + config.defaultInputTarget + '\n'
-        );
+    .version(require('../package.json').version)
+    .usage('[options] <command ...>')
+    .option(
+        '-k, --kill-others',
+        'kill other processes if one exits or dies'
+    )
+    .option(
+        '--kill-others-on-fail',
+        'kill other processes if one exits with non zero status code'
+    )
+    .option(
+        '--no-color',
+        'disable colors from logging'
+    )
+    .option(
+        '-p, --prefix <prefix>',
+        'prefix used in logging for each process.\n' +
+        'Possible values: index, pid, time, command, name, none, or a template. Default: ' +
+        'index or name (when --names is set). Example template: "{time}-{pid}"\n'
+    )
+    .option(
+        '-n, --names <names>',
+        'List of custom names to be used in prefix template.\n' +
+        'Example names: "main,browser,server"\n'
+    )
+    .option(
+        '--name-separator <char>',
+        'The character to split <names> on.\n' +
+        'Default: "' + config.nameSeparator + '". Example usage: ' +
+        'concurrently -n "styles,scripts|server" --name-separator "|" <command ...>\n'
+    )
+    .option(
+        '-c, --prefix-colors <colors>',
+        'Comma-separated list of chalk colors to use on prefixes. If there are more commands than colors, the last color will be repeated.\n' +
+        'Available modifiers: reset, bold, dim, italic, underline, inverse, hidden, strikethrough\n' +
+        'Available colors: black, red, green, yellow, blue, magenta, cyan, white, gray\n' +
+        'Available background colors: bgBlack, bgRed, bgGreen, bgYellow, bgBlue, bgMagenta, bgCyan, bgWhite\n' +
+        'See https://www.npmjs.com/package/chalk for more information.\n' +
+        'Default: "' + config.prefixColors + '". Example: "black.bgWhite,cyan,gray.dim"\n'
+    )
+    .option(
+        '-t, --timestamp-format <format>',
+        'specify the timestamp in moment/date-fns format. Default: ' +
+        config.timestampFormat + '\n'
+    )
+    .option(
+        '-r, --raw',
+        'output only raw output of processes,' +
+        ' disables prettifying and concurrently coloring'
+    )
+    .option(
+        '-s, --success <first|last|all>',
+        'Return exit code of zero or one based on the success or failure ' +
+        'of the "first" child to terminate, the "last" child, or succeed ' +
+        ' only if "all" child processes succeed. Default: ' +
+        config.success + '\n'
+    )
+    .option(
+        '-l, --prefix-length <length>',
+        'limit how many characters of the command is displayed in prefix.\n' +
+        'The option can be used to shorten long commands.\n' +
+        'Works only if prefix is set to "command". Default: ' +
+        config.prefixLength + '\n'
+    )
+    .option(
+        '--allow-restart',
+        'Restart a process which died. Default: ' +
+        config.allowRestart + '\n'
+    )
+    .option(
+        '--restart-after <miliseconds>',
+        'delay time to respawn the process. Default: ' +
+        config.restartAfter + '\n'
+    )
+    .option(
+        '--restart-tries <times>',
+        'limit the number of respawn tries. Default: ' +
+        config.restartTries + '\n'
+    )
+    .option(
+        '--default-input-target <identifier>',
+        'identifier for child process to which input on ' +
+        'stdin should be sent if not specified at start ' +
+        'of input. Can be either the index or the name ' +
+        'of the process. Default: ' + config.defaultInputTarget + '\n'
+    )
 
     program.on('--help', function() {
         const help = [
@@ -232,94 +231,94 @@ function parseArgs() {
             '',
             '       $ concurrently npm:watch-*',
             ''
-        ];
-        console.log(help.join('\n'));
+        ]
+        console.log(help.join('\n'))
 
-        const url = 'https://github.com/kimmobrunfeldt/concurrently';
-        console.log('  For more details, visit ' + url);
-        console.log('');
-    });
+        const url = 'https://github.com/kimmobrunfeldt/concurrently'
+        console.log('  For more details, visit ' + url)
+        console.log('')
+    })
 
-    program.parse(process.argv);
+    program.parse(process.argv)
 }
 
 function mergeDefaultsWithArgs(config) {
     // This will pollute config object with other attributes from program too
-    return _.merge(config, program);
+    return _.merge(config, program)
 }
 
 function run(commands) {
-    const childrenInfo = {};
-    let lastPrefixColor = _.get(chalk, chalk.gray.dim);
+    const childrenInfo = {}
+    let lastPrefixColor = _.get(chalk, chalk.gray.dim)
     const children = _.map(commands, function(cmdInfo, index) {
 
-        const spawnOpts = config.raw ? {stdio: 'inherit'} : {};
+        const spawnOpts = config.raw ? { stdio: 'inherit' } : {}
         if (IS_WINDOWS) {
-            spawnOpts.detached = false;
+            spawnOpts.detached = false
         }
         if (supportsColor) {
-            spawnOpts.env = Object.assign({FORCE_COLOR: supportsColor.level}, process.env);
+            spawnOpts.env = Object.assign({ FORCE_COLOR: supportsColor.level }, process.env)
         }
 
-        const child = spawnChild(cmdInfo.cmd, spawnOpts);
+        const child = spawnChild(cmdInfo.cmd, spawnOpts)
 
         if (cmdInfo.color) {
-            const prefixColorPath = cmdInfo.color;
-            lastPrefixColor = _.get(chalk, prefixColorPath, chalk.gray.dim);
+            const prefixColorPath = cmdInfo.color
+            lastPrefixColor = _.get(chalk, prefixColorPath, chalk.gray.dim)
         }
 
         childrenInfo[child.pid] = {
-            command: cmdInfo.cmd,
-            index: index,
-            name: cmdInfo.name,
-            options: spawnOpts,
+            command     : cmdInfo.cmd,
+            index       : index,
+            name        : cmdInfo.name,
+            options     : spawnOpts,
             restartTries: config.restartTries,
-            prefixColor: lastPrefixColor
-        };
-        return child;
-    });
+            prefixColor : lastPrefixColor
+        }
+        return child
+    })
 
-    const streams = toStreams(children);
+    const streams = toStreams(children)
 
     handleChildEvents(streams, children, childrenInfo);
 
     ['SIGINT', 'SIGTERM'].forEach(function(signal) {
         process.on(signal, function() {
             children.forEach(function(child) {
-                treeKill(child.pid, signal);
-            });
-        });
-    });
+                treeKill(child.pid, signal)
+            })
+        })
+    })
 
     process.stdin.on('data', (chunk) => {
-        let line = chunk.toString();
+        let line = chunk.toString()
 
-        let targetId = config.defaultInputTarget;
+        let targetId = config.defaultInputTarget
         if (line.indexOf(':') >= 0) {
-            const parts = line.split(':');
-            targetId = parts[0];
-            line = parts[1];
+            const parts = line.split(':')
+            targetId = parts[0]
+            line = parts[1]
         }
 
-        const target = findChild(targetId, children, childrenInfo);
+        const target = findChild(targetId, children, childrenInfo)
         if (target) {
-            target.stdin.write(line);
+            target.stdin.write(line)
         } else {
-            logError('', chalk.gray.dim, `Unable to find command [${targetId}]\n`);
+            logError('', chalk.gray.dim, `Unable to find command [${targetId}]\n`)
         }
-    });
+    })
 }
 
 function spawnChild(cmd, options) {
-    let child;
+    let child
     try {
-        child = spawn(cmd, options);
+        child = spawn(cmd, options)
     } catch (e) {
-        logError('', chalk.gray.dim, 'Error occured when executing command: ' + cmd);
-        logError('', chalk.gray.dim, e.stack);
-        process.exit(1);
+        logError('', chalk.gray.dim, 'Error occured when executing command: ' + cmd)
+        logError('', chalk.gray.dim, e.stack)
+        process.exit(1)
     }
-    return child;
+    return child
 }
 
 function toStreams(children) {
@@ -328,236 +327,241 @@ function toStreams(children) {
         const childStreams = {
             error: Rx.Node.fromEvent(child, 'error'),
             close: Rx.Node.fromEvent(child, 'close')
-        };
+        }
         if (!config.raw) {
-            childStreams.stdout = Rx.Node.fromReadableStream(child.stdout);
-            childStreams.stderr = Rx.Node.fromReadableStream(child.stderr);
+            childStreams.stdout = Rx.Node.fromReadableStream(child.stdout)
+            childStreams.stderr = Rx.Node.fromReadableStream(child.stderr)
         }
 
         return _.reduce(childStreams, function(memo, stream, key) {
             memo[key] = stream.map(function(data) {
-                return {child: child, data: data};
-            });
+                return { child: child, data: data }
+            })
 
-            return memo;
-        }, {});
-    });
+            return memo
+        }, {})
+    })
 }
 
 function handleChildEvents(streams, children, childrenInfo) {
-    handleClose(streams, children, childrenInfo);
-    handleError(streams, childrenInfo);
+    handleClose(streams, children, childrenInfo)
+    handleError(streams, childrenInfo)
     if (!config.raw) {
-        handleOutput(streams, childrenInfo, 'stdout');
-        handleOutput(streams, childrenInfo, 'stderr');
+        handleOutput(streams, childrenInfo, 'stdout')
+        handleOutput(streams, childrenInfo, 'stderr')
     }
 }
 
 function handleOutput(streams, childrenInfo, source) {
-    const sourceStreams = _.map(streams, source);
-    const combinedSourceStream = Rx.Observable.merge.apply(this, sourceStreams);
+    const sourceStreams = _.map(streams, source)
+    const combinedSourceStream = Rx.Observable.merge.apply(this, sourceStreams)
 
     combinedSourceStream.subscribe(function(event) {
-        const prefix = getPrefix(childrenInfo, event.child);
-        const prefixColor = childrenInfo[event.child.pid].prefixColor;
-        log(prefix, prefixColor, event.data.toString());
-    });
+        const prefix = getPrefix(childrenInfo, event.child)
+        const prefixColor = childrenInfo[event.child.pid].prefixColor
+        log(prefix, prefixColor, event.data.toString())
+    })
 }
 
 function handleClose(streams, children, childrenInfo) {
-    let aliveChildren = _.clone(children);
-    const exitCodes = [];
-    const closeStreams = _.map(streams, 'close');
-    const closeStream = Rx.Observable.merge.apply(this, closeStreams);
-    let othersKilled = false;
+    let aliveChildren = _.clone(children)
+    const exitCodes = []
+    const closeStreams = _.map(streams, 'close')
+    const closeStream = Rx.Observable.merge.apply(this, closeStreams)
+    let othersKilled = false
 
     // TODO: Is it possible that amount of close events !== count of spawned?
     closeStream.subscribe(function(event) {
-        const exitCode = event.data;
-        const nonSuccess = exitCode !== 0;
-        exitCodes.push(exitCode);
+        const exitCode = event.data
+        const nonSuccess = exitCode !== 0
+        exitCodes.push(exitCode)
 
-        const prefix = getPrefix(childrenInfo, event.child);
-        const childInfo = childrenInfo[event.child.pid];
-        const prefixColor = childInfo.prefixColor;
-        const command = childInfo.command;
-        logEvent(prefix, prefixColor, command + ' exited with code ' + exitCode);
+        const prefix = getPrefix(childrenInfo, event.child)
+        const childInfo = childrenInfo[event.child.pid]
+        const prefixColor = childInfo.prefixColor
+        const command = childInfo.command
+        logEvent(prefix, prefixColor, command + ' exited with code ' + exitCode)
 
         aliveChildren = _.filter(aliveChildren, function(child) {
-            return child.pid !== event.child.pid;
-        });
+            return child.pid !== event.child.pid
+        })
 
         if (nonSuccess && config.allowRestart && childInfo.restartTries--) {
-            respawnChild(event, childrenInfo);
-            return;
+            respawnChild(event, childrenInfo)
+            return
         }
 
         if (aliveChildren.length === 0) {
-            exit(exitCodes);
+            exit(exitCodes)
         }
         if (!othersKilled) {
             if (config.killOthers) {
-                killOtherProcesses(aliveChildren);
-                othersKilled = true;
+                killOtherProcesses(aliveChildren)
+                othersKilled = true
             } else if (config.killOthersOnFail && nonSuccess) {
-                killOtherProcesses(aliveChildren);
-                othersKilled = true;
+                killOtherProcesses(aliveChildren)
+                othersKilled = true
             }
         }
-    });
+    })
 }
 
 function respawnChild(event, childrenInfo) {
     setTimeout(function() {
-        const childInfo = childrenInfo[event.child.pid];
-        const prefix = getPrefix(childrenInfo, event.child);
-        const prefixColor = childInfo.prefixColor;
-        logEvent(prefix, prefixColor, childInfo.command + ' restarted');
-        const newChild = spawnChild(childInfo.command, childInfo.options);
+        const childInfo = childrenInfo[event.child.pid]
+        const prefix = getPrefix(childrenInfo, event.child)
+        const prefixColor = childInfo.prefixColor
+        logEvent(prefix, prefixColor, childInfo.command + ' restarted')
+        const newChild = spawnChild(childInfo.command, childInfo.options)
 
-        childrenInfo[newChild.pid] = childrenInfo[event.child.pid];
-        delete childrenInfo[event.child.pid];
+        childrenInfo[newChild.pid] = childrenInfo[event.child.pid]
+        delete childrenInfo[event.child.pid]
 
-        const children = [newChild];
-        const streams = toStreams(children);
-        handleChildEvents(streams, children, childrenInfo);
-    }, config.restartAfter);
+        const children = [newChild]
+        const streams = toStreams(children)
+        handleChildEvents(streams, children, childrenInfo)
+    }, config.restartAfter)
 }
 
 function killOtherProcesses(processes) {
-    logEvent('--> ', chalk.gray.dim, 'Sending SIGTERM to other processes..');
+    logEvent('--> ', chalk.gray.dim, 'Sending SIGTERM to other processes..')
 
     // Send SIGTERM to alive children
     _.each(processes, function(child) {
-        treeKill(child.pid, 'SIGTERM');
-    });
+        treeKill(child.pid, 'SIGTERM')
+    })
 }
 
 function exit(childExitCodes) {
-    let success;
+    let success
     switch (config.success) {
     case 'first':
-        success = _.first(childExitCodes) === 0;
-        break;
+        success = _.first(childExitCodes) === 0
+        break
     case 'last':
-        success = _.last(childExitCodes) === 0;
-        break;
+        success = _.last(childExitCodes) === 0
+        break
     default:
         success = _.every(childExitCodes, function(code) {
-            return code === 0;
-        });
+            return code === 0
+        })
     }
-    process.exit(success ? 0 : 1);
+    process.exit(success ? 0 : 1)
 }
 
 function handleError(streams, childrenInfo) {
     // Output emitted errors from child process
-    const errorStreams = _.map(streams, 'error');
-    const processErrorStream = Rx.Observable.merge.apply(this, errorStreams);
+    const errorStreams = _.map(streams, 'error')
+    const processErrorStream = Rx.Observable.merge.apply(this, errorStreams)
 
     processErrorStream.subscribe(function(event) {
-        const command = childrenInfo[event.child.pid].command;
-        logError('', chalk.gray.dim, 'Error occured when executing command: ' + command);
-        logError('', chalk.gray.dim, event.data.stack);
-    });
+        const command = childrenInfo[event.child.pid].command
+        logError('', chalk.gray.dim, 'Error occured when executing command: ' + command)
+        logError('', chalk.gray.dim, event.data.stack)
+    })
 }
 
 function colorText(text, color) {
     if (!config.color) {
-        return text;
+        return text
     } else {
-        return color(text);
+        return color(text)
     }
 }
 
 function getPrefix(childrenInfo, child) {
-    const prefixes = getPrefixes(childrenInfo, child);
-    const prefixType = config.prefix || (prefixes.name ? 'name' : 'index');
+    const prefixes = getPrefixes(childrenInfo, child)
+    const prefixType = config.prefix || (prefixes.name ? 'name' : 'index')
     if (_.includes(_.keys(prefixes), prefixType)) {
-        return '[' + prefixes[prefixType] + '] ';
+        return '[' + prefixes[prefixType] + '] '
     }
 
     return _.reduce(prefixes, function(memo, val, key) {
-        const re = new RegExp('{' + key + '}', 'g');
-        return memo.replace(re, val);
-    }, config.prefix) + ' ';
+        const re = new RegExp('{' + key + '}', 'g')
+        return memo.replace(re, val)
+    }, config.prefix) + ' '
 }
 
 function getPrefixes(childrenInfo, child) {
-    const prefixes = {};
+    const prefixes = {}
 
-    prefixes.none = '';
-    prefixes.pid = child.pid;
-    prefixes.index = childrenInfo[child.pid].index;
-    prefixes.name = childrenInfo[child.pid].name;
-    prefixes.time = formatDate(Date.now(), config.timestampFormat);
+    prefixes.none = ''
+    prefixes.pid = child.pid
+    prefixes.index = childrenInfo[child.pid].index
+    prefixes.name = childrenInfo[child.pid].name
+    prefixes.time = formatDate(Date.now(), config.timestampFormat)
 
-    const command = childrenInfo[child.pid].command;
-    prefixes.command = shortenText(command, config.prefixLength);
-    return prefixes;
+    const command = childrenInfo[child.pid].command
+    prefixes.command = shortenText(command, config.prefixLength)
+    return prefixes
 }
 
 function shortenText(text, length, cut) {
     if (text.length <= length) {
-        return text;
+        return text
     }
-    cut = _.isString(cut) ? cut : '..';
+    cut = _.isString(cut) ? cut : '..'
 
-    const endLength = Math.floor(length / 2);
-    const startLength = length - endLength;
+    const endLength = Math.floor(length / 2)
+    const startLength = length - endLength
 
-    const first = text.substring(0, startLength);
-    const last = text.substring(text.length - endLength, text.length);
-    return first + cut + last;
+    const first = text.substring(0, startLength)
+    const last = text.substring(text.length - endLength, text.length)
+    return first + cut + last
 }
 
 function log(prefix, prefixColor, text) {
-    logWithPrefix(prefix, prefixColor, text);
+    logWithPrefix(prefix, prefixColor, text)
 }
 
 function logEvent(prefix, prefixColor, text) {
     if (config.raw) {
-        return;
+        return
     }
 
-    logWithPrefix(prefix, prefixColor, text + '\n', chalk.gray.dim);
+    logWithPrefix(prefix, prefixColor, text + '\n', chalk.gray.dim)
 }
 
 function logError(prefix, prefixColor, text) {
     // This is for now same as log, there might be separate colors for stderr
     // and stdout
-    logWithPrefix(prefix, prefixColor, text, chalk.red.bold);
+    logWithPrefix(prefix, prefixColor, text, chalk.red.bold)
 }
 
-let lastChar;
+let lastChar
 
 function logWithPrefix(prefix, prefixColor, text, color) {
 
     if (config.raw) {
-        process.stdout.write(text);
-        return;
+        process.stdout.write(text)
+        return
     }
 
-    text = text.replace(/\u2026/g,'...'); // Ellipsis
+    text = text.replace(/\u2026/g, '...') // Ellipsis
 
-    const lines = text.split('\n');
+    const lines = text.split('\n')
     // Do not bgColor trailing space
-    const coloredPrefix = colorText(prefix.replace(/ $/, ''), prefixColor) + ' ';
+    const coloredPrefix = colorText(prefix.replace(/ $/, ''), prefixColor) + ' '
     const paddedLines = _.map(lines, function(line, index) {
-        let coloredLine = color ? colorText(line, color) : line;
+        let coloredLine = color ? colorText(line, color) : line
         if (index !== 0 && index !== (lines.length - 1)) {
-            coloredLine = coloredPrefix + coloredLine;
+            coloredLine = coloredPrefix + coloredLine
         }
-        return coloredLine;
-    });
+        return coloredLine
+    })
 
-    if (!lastChar || lastChar === '\n' ) {
-        process.stdout.write(coloredPrefix);
+    if (!lastChar || lastChar === '\n') {
+        process.stdout.write(coloredPrefix)
     }
 
-    lastChar = text[text.length - 1];
+    lastChar = text[text.length - 1]
 
-    process.stdout.write(paddedLines.join('\n'));
+    process.stdout.write(paddedLines.join('\n'))
 }
-
-main();
+main()
+module.exports = function(args) {
+    parseArgs()
+    config = mergeDefaultsWithArgs(config)
+    const cmds = parseCmds(args, config)
+    run(cmds)
+}
